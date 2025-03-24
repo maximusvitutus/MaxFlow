@@ -21,7 +21,7 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-// Get system prompt from prompts
+// Get prompt templates
 const operatorSystemPrompt = fs.readFileSync(path.join(__dirname, '../prompt_templates/system_prompts/operator.txt'), 'utf8');
 const evaluatorSystemPrompt = fs.readFileSync(path.join(__dirname, '../prompt_templates/system_prompts/operatorEvaluator.txt'), 'utf8');
 

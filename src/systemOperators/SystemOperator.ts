@@ -1,6 +1,7 @@
 import { ChatMessage } from '../types/LLMProvider';
 import { OpenAIProvider } from '../providers/OpenAIProvider';
 import { SystemOperatorEvaluator } from '../evaluators/OperatorEvaluator';
+import { EvaluationResult } from '../evaluators/AbstractEvaluator';
 
 /**
  * Manages system-level chat interactions with the AI model
@@ -32,7 +33,11 @@ export class SystemOperator {
    */
   async respondTo(userMessage: string, evaluator?: SystemOperatorEvaluator): Promise<string> {
     this.history.push({ role: 'user', content: userMessage });
+
+    // Feedback history to be potentially used for added feedback
+    const evaluationHistory: EvaluationResult[] = [];
     
+    // Get the initial response
     let response = await this.provider.getResponse(userMessage, this.history);
     let attempts = 0;
 
@@ -49,10 +54,14 @@ export class SystemOperator {
         console.log('Low-quality response:', response);
         console.log('Evaluation:', evaluation);
 
+        // Add the evaluation to the feedback history
+        evaluationHistory.push(evaluation);
+
         // Add evaluation feedback to prompt for improvement
         const improvementPrompt = `Your previous response did not meet quality standards required by the system you are operating in. 
         Please provide a new response to the user's message: ${userMessage} addressing this feedback: ${evaluation.feedback}`;
-        
+
+        // Get the new response
         response = await this.provider.getResponse(improvementPrompt, this.history);
         attempts++;
       }
