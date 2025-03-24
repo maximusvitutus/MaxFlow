@@ -18,7 +18,7 @@ export class OpenAIProvider extends LLMProvider {
         super(apiKey);
         this.client = new OpenAI({ apiKey });
         this.config = {
-            model: config.model || 'gpt-4o',
+            model: config.model || 'gpt-4o-mini',
             temperature: config.temperature || 1,
             maxTokens: config.maxTokens || 3000
         };
