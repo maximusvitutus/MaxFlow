@@ -1,0 +1,22 @@
+{
+  "name": "writing-agent",
+  "version": "1.0.0",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "openai": "^4.89.0"
+  },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "chat": "ts-node src/cli/chat.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^22.13.12",
+    "typescript": "^5.8.2"
+  }
+}
