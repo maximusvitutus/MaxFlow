@@ -1,5 +1,6 @@
-import { Evaluator, EvaluationResult } from './AbstractEvaluator';
-import { LLMProvider, ChatMessage } from '../types/LLMProvider';
+import { Evaluator, EvaluationResult } from './abstractEvaluator';
+import { LLMProvider, ChatMessage } from '../../tools/providers/abstractProvider';
+import { parseJSONSafe } from '../../tools/utils/jsonParser';
 
 export class SystemOperatorEvaluator extends Evaluator {
     constructor(llmProvider: LLMProvider, ownSystemPrompt: string, analyzableSystemPrompt: string) {
@@ -17,7 +18,7 @@ export class SystemOperatorEvaluator extends Evaluator {
         const evaluation = await this.llmProvider.getResponse(evaluationPrompt, history);
         
         try {
-            const result = JSON.parse(evaluation);
+            const result = await parseJSONSafe(evaluation);
             return {
                 score: result.score,
                 explanation: result.explanation,

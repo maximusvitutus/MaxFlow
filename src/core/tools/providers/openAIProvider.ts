@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { ChatMessage, LLMProvider, LLMConfig } from '../types/LLMProvider';
+import { ChatMessage, LLMProvider, LLMConfig } from './abstractProvider';
 
 /**
  * Provider for OpenAI's API integration

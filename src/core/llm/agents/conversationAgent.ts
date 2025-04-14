@@ -1,27 +1,29 @@
-import { ChatMessage } from '../types/LLMProvider';
-import { OpenAIProvider } from '../providers/OpenAIProvider';
-import { SystemOperatorEvaluator } from '../evaluators/OperatorEvaluator';
-import { EvaluationResult } from '../evaluators/AbstractEvaluator';
-
+import { ChatMessage } from '../../tools/providers/abstractProvider';
+import { OpenAIProvider } from '../../tools/providers/openAIProvider';
+import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
+import { EvaluationResult } from '../agentEvaluators/abstractEvaluator';
+import { SystemOperator } from '../operators/abstractOperator';
 /**
  * Manages system-level chat interactions with the AI model
  */
-export class SystemOperator {
+export class ConversationAgent {
   private provider: OpenAIProvider;
   private history: ChatMessage[] = [];
   private systemPrompt: string;
   private ACCEPTABLE_SCORE = 90; // Minimum acceptable evaluation score
   private MAX_ATTEMPTS = 3;
+  private operator: SystemOperator;
 
   /**
    * Creates a new SystemOperator instance
    * @param {OpenAIProvider} provider - The OpenAI provider instance
    * @param {string} systemPrompt - The initial system prompt to set context
    */
-  constructor(provider: OpenAIProvider, systemPrompt: string) {
+  constructor(provider: OpenAIProvider, systemPrompt: string, operator: SystemOperator) {
     this.provider = provider;
     this.systemPrompt = systemPrompt;
     this.history.push({ role: 'system', content: this.systemPrompt });
+    this.operator = operator;
   }
 
   /**
@@ -59,7 +61,7 @@ export class SystemOperator {
 
         // Add evaluation feedback to prompt for improvement
         const improvementPrompt = `Your previous response did not meet quality standards required by the system you are operating in. 
-        Please provide a new response to the user's message: ${userMessage} addressing this feedback: ${evaluation.feedback}`;
+        Please provide a new response to the user's message: ${userMessage} addressing this feedback: ${evaluation.feedback}. `;
 
         // Get the new response
         response = await this.provider.getResponse(improvementPrompt, this.history);
@@ -77,6 +79,14 @@ export class SystemOperator {
     this.history.push({ role: 'assistant', content: response });
     return response;
   }
+
+  /**
+  * Move forward with proposed plan. Send the plan to the operator.
+  * @param {string} context - The context to send to the operator
+  */
+  async callOperator(context: string) {
+    await this.operator.routeRequest(context);
+  } 
 
   /**
    * Retrieves the full conversation history

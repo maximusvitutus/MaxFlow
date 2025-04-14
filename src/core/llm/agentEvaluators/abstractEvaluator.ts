@@ -1,4 +1,4 @@
-import { LLMProvider, ChatMessage } from '../types/LLMProvider';
+import { LLMProvider, ChatMessage } from '../../tools/providers/abstractProvider';
 
 export abstract class Evaluator {
     protected llmProvider: LLMProvider;
