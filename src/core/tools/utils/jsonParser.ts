@@ -1,7 +1,9 @@
 /**
- * Parses a JSON string safely.
- * @param input - The input string to parse.
- * @returns The parsed JSON object.
+ * Parses a JSON string safely, handling common formatting issues
+ * 
+ * @param input - The input string to parse
+ * @returns A promise resolving to the parsed JSON object
+ * @throws Error if parsing fails after cleanup attempts
  */
 export async function parseJSONSafe(input: string): Promise<any> {
     try {

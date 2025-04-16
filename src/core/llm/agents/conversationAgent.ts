@@ -1,5 +1,4 @@
-import { ChatMessage } from '../../tools/providers/abstractProvider';
-import { OpenAIProvider } from '../../tools/providers/openAIProvider';
+import { ChatMessage, LLMProvider } from '../../tools/providers/abstractProvider';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
 import { EvaluationResult } from '../agentEvaluators/abstractEvaluator';
 import { SystemOperator } from '../operators/abstractOperator';
@@ -7,19 +6,27 @@ import { SystemOperator } from '../operators/abstractOperator';
  * Manages system-level chat interactions with the AI model
  */
 export class ConversationAgent {
-  private provider: OpenAIProvider;
+  /** The LLM provider used for generating responses */
+  private provider: LLMProvider;
+  /** Full conversation history */
   private history: ChatMessage[] = [];
+  /** System prompt that guides the agent's behavior */
   private systemPrompt: string;
-  private ACCEPTABLE_SCORE = 90; // Minimum acceptable evaluation score
+  /** Minimum score considered acceptable in evaluations */
+  private ACCEPTABLE_SCORE = 90;
+  /** Maximum number of response improvement attempts */
   private MAX_ATTEMPTS = 3;
+  /** System operator for handling the writing process */
   private operator: SystemOperator;
 
   /**
-   * Creates a new SystemOperator instance
-   * @param {OpenAIProvider} provider - The OpenAI provider instance
-   * @param {string} systemPrompt - The initial system prompt to set context
+   * Creates a new ConversationAgent instance
+   * 
+   * @param provider - The LLM provider instance
+   * @param systemPrompt - The initial system prompt to set context
+   * @param operator - The system operator for handling specialized tasks
    */
-  constructor(provider: OpenAIProvider, systemPrompt: string, operator: SystemOperator) {
+  constructor(provider: LLMProvider, systemPrompt: string, operator: SystemOperator) {
     this.provider = provider;
     this.systemPrompt = systemPrompt;
     this.history.push({ role: 'system', content: this.systemPrompt });
@@ -29,9 +36,10 @@ export class ConversationAgent {
   /**
    * Sends a user message and gets AI response while maintaining conversation history
    * Incorporates evaluation feedback for responses that don't meet quality threshold
-   * @param {string} userMessage - The message from the user
-   * @param {SystemOperatorEvaluator} evaluator - The evaluator instance
-   * @returns {Promise<string>} The AI's response
+   * 
+   * @param userMessage - The message from the user
+   * @param evaluator - Optional evaluator for quality control
+   * @returns A promise resolving to the AI's response
    */
   async respondTo(userMessage: string, evaluator?: SystemOperatorEvaluator): Promise<string> {
     this.history.push({ role: 'user', content: userMessage });
@@ -81,16 +89,19 @@ export class ConversationAgent {
   }
 
   /**
-  * Move forward with proposed plan. Send the plan to the operator.
-  * @param {string} context - The context to send to the operator
-  */
-  async callOperator(context: string) {
+   * Move forward with proposed plan by sending the context to the operator
+   * 
+   * @param context - The context to send to the operator
+   * @returns A promise that resolves when the operator has processed the request
+   */
+  async callOperator(context: string): Promise<void> {
     await this.operator.routeRequest(context);
   } 
 
   /**
    * Retrieves the full conversation history
-   * @returns {ChatMessage[]} Array of conversation messages
+   * 
+   * @returns Array of conversation messages
    */
   getConversationHistory(): ChatMessage[] {
     return this.history;

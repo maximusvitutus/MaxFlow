@@ -4,8 +4,14 @@ import { SystemOperator } from "./abstractOperator";
 
 /**
  * Mock operator for testing purposes. 
+ * 
+ * @class
+ * @extends {SystemOperator}
  */
 export class MockOperator extends SystemOperator {
+    /**
+     * Creates a new MockOperator instance
+     */
     constructor() {
         super();
     }
