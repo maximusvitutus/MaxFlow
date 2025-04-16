@@ -1,21 +1,7 @@
-import { BaseAgentResponse } from "./schemas";
-import { ConversationAgentResponse } from "./schemas";
-
-/**
- * Abstract base class for all agent response parsers.
- * Defines the interface for parsing raw LLM responses into structured agent responses.
- * 
- * @typeParam T - The type of agent response that this parser produces
- */
-export abstract class AgentResponseParser<T extends BaseAgentResponse> {
-  /**
-   * Parses a raw text response into a structured agent response.
-   * 
-   * @param rawResponse - The raw text response from the LLM
-   * @returns A structured agent response object
-   */
-  abstract parse(rawResponse: string): T;
-}
+import { ConversationAgentResponse } from "../responseSchemas";
+import { AgentResponseParseError } from "../../../../types/errors/parsingError";
+import { AgentResponseParser } from "./abstractParser";
+import { SchemaValidator } from "../schemaValidator";
 
 /**
  * Parser for conversation agent responses.
@@ -74,22 +60,5 @@ export class ConversationAgentResponseParser extends AgentResponseParser<Convers
       }
       throw new AgentResponseParseError(`Failed to parse response: ${err.message}`, rawResponse);
     }
-  }
-}
-
-/**
- * Error class for agent response parsing failures.
- * Provides information about what went wrong during parsing.
- */
-class AgentResponseParseError extends Error {
-  /**
-   * Creates a new AgentResponseParseError.
-   * 
-   * @param message - The error message
-   * @param originalResponse - The original raw response that failed to parse
-   */
-  constructor(message: string, public originalResponse?: string) {
-    super(message);
-    this.name = 'AgentResponseParseError';
   }
 }

@@ -25,7 +25,7 @@ type SchemaDefinition = {
  * Validates data objects against a defined schema.
  * Ensures that objects conform to expected structure and data types.
  */
-class SchemaValidator {
+export class SchemaValidator {
   /**
    * Creates a new schema validator with the given schema definition.
    * 

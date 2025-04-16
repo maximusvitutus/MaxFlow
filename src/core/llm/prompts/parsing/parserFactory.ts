@@ -1,7 +1,7 @@
 import { AgentType } from "../../agents/abstractAgents";
-import { ConversationAgentResponseParser } from "./responseParsers";
-import { AgentResponseParser } from "./responseParsers";
-import { BaseAgentResponse } from "./schemas";
+import { ConversationAgentResponseParser } from "./parsers/conversationParser";
+import { AgentResponseParser } from "./parsers/abstractParser";
+import { BaseAgentResponse } from "./responseSchemas";
 
 /**
  * Factory class for creating agent response parsers.
