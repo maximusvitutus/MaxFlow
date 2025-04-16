@@ -1,24 +1,13 @@
 import { ChatMessage, LLMProvider } from '../../tools/providers/abstractProvider';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
-import { EvaluationResult } from '../agentEvaluators/abstractEvaluator';
 import { SystemOperator } from '../operators/abstractOperator';
+import { AbstractAgent } from './abstractAgents';
+
 /**
  * Manages system-level chat interactions with the AI model
+ * This agent is directly controlled by user input
  */
-export class ConversationAgent {
-  /** The LLM provider used for generating responses */
-  private provider: LLMProvider;
-  /** Full conversation history */
-  private history: ChatMessage[] = [];
-  /** System prompt that guides the agent's behavior */
-  private systemPrompt: string;
-  /** Minimum score considered acceptable in evaluations */
-  private ACCEPTABLE_SCORE = 90;
-  /** Maximum number of response improvement attempts */
-  private MAX_ATTEMPTS = 3;
-  /** System operator for handling the writing process */
-  private operator: SystemOperator;
-
+export class ConversationAgent extends AbstractAgent {
   /**
    * Creates a new ConversationAgent instance
    * 
@@ -27,10 +16,7 @@ export class ConversationAgent {
    * @param operator - The system operator for handling specialized tasks
    */
   constructor(provider: LLMProvider, systemPrompt: string, operator: SystemOperator) {
-    this.provider = provider;
-    this.systemPrompt = systemPrompt;
-    this.history.push({ role: 'system', content: this.systemPrompt });
-    this.operator = operator;
+    super(provider, systemPrompt, operator);
   }
 
   /**
@@ -44,44 +30,12 @@ export class ConversationAgent {
   async respondTo(userMessage: string, evaluator?: SystemOperatorEvaluator): Promise<string> {
     this.history.push({ role: 'user', content: userMessage });
 
-    // Feedback and response history
-    const evaluationHistory: EvaluationResult[] = [];
-    const responseHistory: string[] = [];
-    
     // Get the initial response
     let response = await this.provider.getResponse(userMessage, this.history);
-    let attempts = 0;
-    responseHistory.push(response);
 
     // If evaluator is provided, check response quality and retry if needed
     if (evaluator) {
-      while (attempts < this.MAX_ATTEMPTS) {
-        const evaluation = await evaluator.evaluate(response, this.history);
-        evaluationHistory.push(evaluation);  // Store every evaluation
-        
-        if (evaluation.score >= this.ACCEPTABLE_SCORE) {
-          break;
-        }
-
-        // Log the response and the evaluation
-        console.log('Low-quality response:', response);
-        console.log('Evaluation:', evaluation);
-
-        // Add evaluation feedback to prompt for improvement
-        const improvementPrompt = `Your previous response did not meet quality standards required by the system you are operating in. 
-        Please provide a new response to the user's message: ${userMessage} addressing this feedback: ${evaluation.feedback}. `;
-
-        // Get the new response
-        response = await this.provider.getResponse(improvementPrompt, this.history);
-        responseHistory.push(response);
-        attempts++;
-      }
-      // Pick the best response from the response history
-      const bestEvaluation = evaluationHistory.reduce((best, current) => {
-        return (current.score > best.score) ? current : best;
-      }, evaluationHistory[0]);
-      
-      response = responseHistory[evaluationHistory.indexOf(bestEvaluation)];
+      response = await this.evaluateAndImprove(response, evaluator, userMessage);
     }
 
     this.history.push({ role: 'assistant', content: response });
@@ -89,21 +43,12 @@ export class ConversationAgent {
   }
 
   /**
-   * Move forward with proposed plan by sending the context to the operator
+   * Sends the given context to the operator for processing
    * 
    * @param context - The context to send to the operator
    * @returns A promise that resolves when the operator has processed the request
    */
   async callOperator(context: string): Promise<void> {
     await this.operator.routeRequest(context);
-  } 
-
-  /**
-   * Retrieves the full conversation history
-   * 
-   * @returns Array of conversation messages
-   */
-  getConversationHistory(): ChatMessage[] {
-    return this.history;
   }
 }
