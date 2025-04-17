@@ -21,7 +21,8 @@ export class MockOperator extends SystemOperator {
      * @param request - The request to propose a writing structure for.
      * @returns A promise that resolves to the proposed writing structure.
      */
-    async proposeWritingStructure(request: string): Promise<WritingStructureDraft> {
+    async getWritingStructure(request: string): Promise<WritingStructureDraft> {
+        console.log("(MockOperator) getWritingStructure called with request:", request);
         return {
             id: "1",
             sections: [],
@@ -36,7 +37,8 @@ export class MockOperator extends SystemOperator {
      * @param request - The request to propose a knowledge tree for.
      * @returns A promise that resolves to the proposed knowledge tree.
      */
-    async proposeKnowledgeTree(request: string): Promise<KnowledgeTreeDraft> {
+    async getKnowledgeTree(request: string): Promise<KnowledgeTreeDraft> {
+        console.log("(MockOperator) getKnowledgeTree called with request:", request);
         return {
             id: "1",    
             targetDepth: AnalysisDepth.SHALLOW,
@@ -53,14 +55,5 @@ export class MockOperator extends SystemOperator {
                 children: [],
             }
         };
-    }
-
-    /**
-     * Handles the initial user request.
-     * @param request - The request to handle.
-     * @returns A promise that resolves to the proposed writing structure or knowledge tree.
-     */
-    async routeRequest(request: string): Promise<WritingStructureDraft | KnowledgeTreeDraft> {
-        return this.proposeWritingStructure(request);
     }
 }

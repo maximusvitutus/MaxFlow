@@ -1,7 +1,10 @@
-import { ChatMessage, LLMProvider } from '../../tools/providers/abstractProvider';
+import { LLMProvider } from '../../tools/providers/abstractProvider';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
 import { SystemOperator } from '../operators/abstractOperator';
-import { AbstractAgent } from './abstractAgents';
+import { AgentResponseParserFactory } from '../prompts/parsing/parserFactory';
+import { ConversationAgentResponse } from '../prompts/parsing/responseSchemas';
+import { AbstractAgent, AgentType } from './abstractAgents';
+import { ToolCall } from '../../types/toolCall';
 
 /**
  * Manages system-level chat interactions with the AI model
@@ -20,35 +23,72 @@ export class ConversationAgent extends AbstractAgent {
   }
 
   /**
-   * Sends a user message and gets AI response while maintaining conversation history
-   * Incorporates evaluation feedback for responses that don't meet quality threshold
+   * Entry point for processing user messages.
+   * Adds message to history and triggers response generation.
    * 
    * @param userMessage - The message from the user
    * @param evaluator - Optional evaluator for quality control
    * @returns A promise resolving to the AI's response
    */
-  async respondTo(userMessage: string, evaluator?: SystemOperatorEvaluator): Promise<string> {
+  async processMessage(userMessage: string, evaluator?: SystemOperatorEvaluator): Promise<string> {
+    // Add the user message to history
     this.history.push({ role: 'user', content: userMessage });
+    
+    // Generate response (uses evaluation and may improve response with multiple calls)
+    const response = await this.respondTo(userMessage, evaluator);
 
-    // Get the initial response
-    let response = await this.provider.getResponse(userMessage, this.history);
-
-    // If evaluator is provided, check response quality and retry if needed
-    if (evaluator) {
-      response = await this.evaluateAndImprove(response, evaluator, userMessage);
+    // Parse the final response
+    const parser = AgentResponseParserFactory.createParser(AgentType.CONVERSATION);
+    const parsedResponse: ConversationAgentResponse = parser.parse(response);
+    
+    // Handle any tool calls in the response
+    if (parsedResponse.toolCalls && parsedResponse.toolCalls.length > 0) {
+      console.log("(ConversationAgent) Registered tool calls:", parsedResponse.toolCalls);
+      for (const toolCall of parsedResponse.toolCalls) {
+        await this.handleToolCall(toolCall);
+      }
     }
-
+    
+    // Add the assistant's response to the history
     this.history.push({ role: 'assistant', content: response });
+    
     return response;
   }
 
   /**
-   * Sends the given context to the operator for processing
+   * Generates AI response to user message and handles any necessary operations
    * 
-   * @param context - The context to send to the operator
-   * @returns A promise that resolves when the operator has processed the request
+   * @param userMessage - The message from the user
+   * @param evaluator - Optional evaluator for quality control
+   * @returns A promise resolving to the processed response
    */
-  async callOperator(context: string): Promise<void> {
-    await this.operator.routeRequest(context);
+  public async respondTo(userMessage: string, evaluator?: SystemOperatorEvaluator): Promise<string> {
+    // Get the initial response
+    let response = await this.provider.getResponse(userMessage, this.history);
+
+    // Improve with feedback if evaluation too low
+    if (evaluator) {
+      response = await this.evaluateAndImprove(response, evaluator, userMessage);
+    }
+
+    return response;
+  }
+
+  /**
+   * Handles tool calls parsed from the LLM response.
+   * 
+   * @param toolCall - The tool call object from the parsed response
+   */
+  private async handleToolCall(toolCall: ToolCall): Promise<void> {
+    switch (toolCall.function.name) {
+      case 'getWritingStructure':
+        await this.operator.getWritingStructure("Mock request");
+        break;
+      case 'getKnowledgeTree':
+        await this.operator.getKnowledgeTree("Mock request");
+        break;
+      default:
+        console.error(`Unknown tool call: ${name}`);
+    }
   }
 }

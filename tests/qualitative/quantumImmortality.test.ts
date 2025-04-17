@@ -73,12 +73,14 @@ async function runTestCase(description: string, modelResponse: string): Promise<
     // Get testing agent's evaluation
     const result = await testingAgent.evaluateResponseQuality(description, modelResponse);
 
-    // Assert based on testing agent's evaluation
-    expect(result.passed).toBe(true);
+    // Log details before assertion (for now, a more sophisticated logging system will be implemented later)
     if (!result.passed) {
         console.log(`Test failed. Reasoning: ${result.reasoning}`);
         console.log(`Evidence: ${result.evidence}`);
     }
+    
+    // Assert based on testing agent's evaluation
+    expect(result.passed).toBe(true);
 }
 
 // Create test where, the user sends these 3 messages, the response from the model should: 

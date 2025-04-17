@@ -18,7 +18,10 @@ describe('MockOperator', () => {
     });
 
     it('MockOperator should handle the initial user request', async () => {
-        const answer = await operator.routeRequest("test");
+        const answer = await operator.callFunction({
+            functionName: "proposeWritingStructure",
+            args: { request: "test" }
+        });
         expect(answer).toBeDefined();
     });
 });

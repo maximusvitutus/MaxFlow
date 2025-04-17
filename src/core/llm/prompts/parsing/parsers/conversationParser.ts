@@ -2,6 +2,7 @@ import { ConversationAgentResponse } from "../responseSchemas";
 import { AgentResponseParseError } from "../../../../types/errors/parsingError";
 import { AgentResponseParser } from "./abstractParser";
 import { SchemaValidator } from "../schemaValidator";
+import { ToolCall } from "../../../../types/toolCall";
 
 /**
  * Parser for conversation agent responses.
@@ -26,8 +27,16 @@ export class ConversationAgentResponseParser extends AgentResponseParser<Convers
         required: true,
       },
       toolCalls: {
-        type: 'string',
-        required: true,
+        type: 'array',
+        required: false,
+        validate: (value: any[]) => {
+          if (!Array.isArray(value)) return true; // Skip validation if not provided
+          return value.every(item => 
+            typeof item === 'object' && 
+            typeof item.name === 'string' && 
+            typeof item.arguments === 'object'
+          );
+        }
       }
     });
   }
@@ -42,6 +51,7 @@ export class ConversationAgentResponseParser extends AgentResponseParser<Convers
   parse(rawResponse: string): ConversationAgentResponse {
     try {
       const parsedResponse = JSON.parse(rawResponse);
+      console.log("(ConversationAgentResponseParser) Parsed response:", parsedResponse);
       
       const validation = this.validator.validate(parsedResponse);
       if (!validation.valid) {
@@ -50,8 +60,28 @@ export class ConversationAgentResponseParser extends AgentResponseParser<Convers
           rawResponse
         );
       }
+
+      // Extract the strings from the parsed response
+      const reasoning: string = parsedResponse.reasoning;
+      const answerToUser: string = parsedResponse.answerToUser;
+
+      // Extract tool calls with a standardized approach
+      const toolCalls: ToolCall[] = Array.isArray(parsedResponse.toolCalls) ? 
+        parsedResponse.toolCalls.map((toolCall: any) => {
+          return {
+            function: {
+              name: toolCall.name,
+              args: toolCall.arguments
+            }
+          };
+        }) : [];
       
-      return parsedResponse as ConversationAgentResponse;
+      // Return the parsed response with tool calls
+      return {
+        reasoning: reasoning, 
+        answerToUser: answerToUser, 
+        toolCalls: toolCalls
+      } as ConversationAgentResponse;
     } catch (error) {
       // Maybe fix idk
       const err = error as Error

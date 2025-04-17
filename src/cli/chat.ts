@@ -71,7 +71,7 @@ async function startChat() {
         }
 
         try {
-            const response = await chatAgent.respondTo(userInput, evaluator);
+            const response = await chatAgent.processMessage(userInput, evaluator);
             history.push({ role: 'user', content: userInput });
             history.push({ role: 'assistant', content: response });
             console.log('\nAI:', response, '\n\n');

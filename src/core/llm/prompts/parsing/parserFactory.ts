@@ -15,7 +15,7 @@ export class AgentResponseParserFactory {
    * @returns An agent response parser instance
    * @throws Error if the agent type is not supported
    */
-  static createParser(agentType: AgentType): AgentResponseParser<BaseAgentResponse> {
+  static createParser(agentType: AgentType): AgentResponseParser<any> {
     switch (agentType) {
       case AgentType.CONVERSATION:
         return new ConversationAgentResponseParser();

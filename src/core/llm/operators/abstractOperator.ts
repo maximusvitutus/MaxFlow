@@ -26,7 +26,7 @@ export abstract class SystemOperator {
      * @param request - The user's writing request
      * @returns A promise resolving to a writing structure draft
      */
-    abstract proposeWritingStructure(request: string): Promise<WritingStructureDraft>;
+    abstract getWritingStructure(request: string): Promise<WritingStructureDraft>;
 
     /**
      * Proposes a knowledge tree for research based on the user's request
@@ -34,13 +34,5 @@ export abstract class SystemOperator {
      * @param request - The user's research request
      * @returns A promise resolving to a knowledge tree draft
      */
-    abstract proposeKnowledgeTree(request: string): Promise<KnowledgeTreeDraft>;
-
-    /**
-     * Routes a user request to the appropriate handling method
-     * 
-     * @param userRequest - The user's request to be processed
-     * @returns A promise resolving to either a writing structure or knowledge tree draft
-     */
-    abstract routeRequest(userRequest: string): Promise<WritingStructureDraft | KnowledgeTreeDraft>;
+    abstract getKnowledgeTree(request: string): Promise<KnowledgeTreeDraft>;
 }

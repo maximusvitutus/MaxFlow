@@ -1,5 +1,4 @@
 import { BaseAgentResponse } from "../responseSchemas";
-import { ConversationAgentResponse } from "../responseSchemas";
 
 /**
  * Abstract base class for all agent response parsers.
