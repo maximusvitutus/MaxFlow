@@ -2,6 +2,7 @@ import { ChatMessage, LLMProvider } from '../../tools/providers/abstractProvider
 import { SystemOperator } from '../operators/abstractOperator';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
 import { EvaluationResult } from '../agentEvaluators/abstractEvaluator';
+import { AgentTaskType } from './taskTypes';
 
 /**
  * Abstract base class for all AI agents in the system
@@ -106,11 +107,16 @@ export abstract class OperatorControlledAgent extends AbstractAgent {
   /**
    * Processes a task given by the system operator
    * 
-   * @param task - The task description or data to process
+   * @param instructions - The instructions for the task to process
+   * @param taskType - The type of task to perform
    * @param evaluator - Optional evaluator for quality control
    * @returns A promise resolving to the agent's output
    */
-  abstract processOperatorTask(task: any, evaluator?: SystemOperatorEvaluator): Promise<any>;
+  abstract processOperatorTask(
+    instructions: string, 
+    taskType: AgentTaskType, 
+    evaluator?: SystemOperatorEvaluator
+  ): Promise<any>;
 }
 
 /**
@@ -118,4 +124,5 @@ export abstract class OperatorControlledAgent extends AbstractAgent {
  */
 export enum AgentType {
   CONVERSATION = 'conversation',
+  WRITING = 'writing',
 }

@@ -1,4 +1,5 @@
 import { ToolCall } from '../../../types/toolCall'
+import { TextSection, WritingStructureDraft } from '../../../types/writing/writingStructure';
 
 /**
  * Base response interface that all agent responses must implement.
@@ -41,5 +42,24 @@ export interface OperatorAgentResponse extends BaseAgentResponse {
    * Tool calls that the operator agent needs to make
    */
   toolCalls: ToolCall[];
+}
+
+/**
+ * Response interface for the WritingAgent.
+ * Focused on delivering writing structures and drafts.
+ */
+export interface WritingAgentResponse extends BaseAgentResponse {
+  /**
+   * Message to be shown to the operator
+   */
+  messageToOperator: string;
+  
+  /**
+   * The deliverables produced by the agent, which can include
+   * writing structure drafts and/or complete writing drafts
+   */
+  deliverables: {
+    writingStructureDraft?: TextSection[];
+  };
 }
 

@@ -5,7 +5,7 @@
  * @returns A promise resolving to the parsed JSON object
  * @throws Error if parsing fails after cleanup attempts
  */
-export async function parseJSONSafe(input: string): Promise<any> {
+export function parseJSONSafe(input: string): any {
     try {
         // Log the input for debugging
         console.log('Raw evaluation input:', input);

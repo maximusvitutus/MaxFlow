@@ -1,7 +1,7 @@
 import { AgentType } from "../../agents/abstractAgents";
-import { ConversationAgentResponseParser } from "./parsers/conversationParser";
+import { ConversationAgentParser } from "./parsers/conversationParser";
 import { AgentResponseParser } from "./parsers/abstractParser";
-import { BaseAgentResponse } from "./responseSchemas";
+import { WritingAgentParser } from "./parsers/writingAgentParser";
 
 /**
  * Factory class for creating agent response parsers.
@@ -18,9 +18,11 @@ export class AgentResponseParserFactory {
   static createParser(agentType: AgentType): AgentResponseParser<any> {
     switch (agentType) {
       case AgentType.CONVERSATION:
-        return new ConversationAgentResponseParser();
+        return new ConversationAgentParser();
+      case AgentType.WRITING:
+        return new WritingAgentParser();
       default:
-        throw new Error(`Unknown agent type: ${agentType}`);
+        throw new Error(`No parser available for agent type: ${agentType}`);
     }
   }
 }

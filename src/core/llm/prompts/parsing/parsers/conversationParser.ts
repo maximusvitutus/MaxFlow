@@ -8,7 +8,7 @@ import { ToolCall } from "../../../../types/toolCall";
  * Parser for conversation agent responses.
  * Validates and converts raw JSON responses into ConversationAgentResponse objects.
  */
-export class ConversationAgentResponseParser extends AgentResponseParser<ConversationAgentResponse> {
+export class ConversationAgentParser extends AgentResponseParser<ConversationAgentResponse> {
   private validator: SchemaValidator;
 
   /**
