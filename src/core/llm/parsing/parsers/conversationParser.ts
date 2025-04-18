@@ -1,8 +1,8 @@
 import { ConversationAgentResponse } from "../responseSchemas";
-import { AgentResponseParseError } from "../../../../types/errors/parsingError";
+import { AgentResponseParseError } from "../../../types/errors/parsingError";
 import { AgentResponseParser } from "./abstractParser";
 import { SchemaValidator } from "../schemaValidator";
-import { ToolCall } from "../../../../types/toolCall";
+import { ToolCall } from "../../../types/toolCall";
 
 /**
  * Parser for conversation agent responses.

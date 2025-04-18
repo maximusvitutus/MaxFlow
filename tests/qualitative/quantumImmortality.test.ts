@@ -1,8 +1,8 @@
 import { OpenAIProvider } from "../../src/core/tools/providers/openAIProvider";
 import { loadPrompt } from "../../src/config/promptConfig";
 import { ConversationAgent } from "../../src/core/llm/agents/conversationAgent";
-import { MockOperator } from "../../src/core/llm/operators/mockOperator";
-import { TestingAgent } from "../testingAgent";
+import { MockOperator } from "../mocks/mockOperator";
+import { QualitativeAnalyzer } from "../qualitativeAnalyzer";
 import path from "path";
 import { config } from "dotenv";
 
@@ -68,7 +68,7 @@ async function runTestCase(description: string, modelResponse: string): Promise<
     // Load testing prompt
     const responseQualityPrompt = loadPrompt('./tests/prompts/responseQualityTest.yaml');
     const conversationQualityPrompt = loadPrompt('./tests/prompts/conversationQualityTest.yaml');
-    const testingAgent = new TestingAgent(testingLLM, responseQualityPrompt, conversationQualityPrompt);
+    const testingAgent = new QualitativeAnalyzer(testingLLM, responseQualityPrompt, conversationQualityPrompt);
     
     // Get testing agent's evaluation
     const result = await testingAgent.evaluateResponseQuality(description, modelResponse);

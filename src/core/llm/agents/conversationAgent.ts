@@ -1,8 +1,8 @@
 import { LLMProvider, ChatMessage } from '../../tools/providers/abstractProvider';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
 import { SystemOperator } from '../operators/abstractOperator';
-import { AgentResponseParserFactory } from '../prompts/parsing/parserFactory';
-import { ConversationAgentResponse } from '../prompts/parsing/responseSchemas';
+import { AgentResponseParserFactory } from '../parsing/parserFactory';
+import { ConversationAgentResponse } from '../parsing/responseSchemas';
 import { AbstractAgent, AgentType } from './abstractAgents';
 import { ToolCall } from '../../types/toolCall';
 

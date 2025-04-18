@@ -1,5 +1,5 @@
-import { ToolCall } from '../../../types/toolCall'
-import { TextSection, WritingStructureDraft } from '../../../types/writing/writingStructure';
+import { ToolCall } from '../../types/toolCall'
+import { TextSection, WritingStructureDraft } from '../../types/writing/writingStructure';
 
 /**
  * Base response interface that all agent responses must implement.

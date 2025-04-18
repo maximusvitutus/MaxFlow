@@ -1,4 +1,4 @@
-import { AgentType } from "../../agents/abstractAgents";
+import { AgentType } from "../agents/abstractAgents";
 import { ConversationAgentParser } from "./parsers/conversationParser";
 import { AgentResponseParser } from "./parsers/abstractParser";
 import { WritingAgentParser } from "./parsers/writingAgentParser";

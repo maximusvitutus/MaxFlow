@@ -1,9 +1,9 @@
 import { AgentResponseParser } from './abstractParser';
 import { WritingAgentResponse } from '../responseSchemas';
-import { AgentResponseParseError } from '../../../../types/errors/parsingError';
+import { AgentResponseParseError } from '../../../types/errors/parsingError';
 import { SchemaValidator } from '../schemaValidator';
-import { TextSection } from '../../../../types/writing/writingStructure';
-import { parseJSONSafe } from '../../../../tools/utils/jsonParser';
+import { TextSection } from '../../../types/writing/writingStructure';
+import { parseJSONSafe } from '../../../tools/utils/jsonParser';
 
 /**
  * Parser for WritingAgent responses.
@@ -80,10 +80,6 @@ export class WritingAgentParser extends AgentResponseParser<WritingAgentResponse
           rawResponse
         );
       }
-
-      // Extract the strings from the parsed response
-      const reasoning: string = parsedJson.reasoning;
-      const messageToOperator: string = parsedJson.messageToOperator;
       
       // Transform the sections array to match our TextSection interface
       const rawSections = parsedJson.deliverables.writingStructureDraft.sections || [];
