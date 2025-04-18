@@ -10,6 +10,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
     "chat": "ts-node src/cli/chat.ts"
   },
   "keywords": [],
