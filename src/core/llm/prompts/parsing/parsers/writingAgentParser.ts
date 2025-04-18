@@ -2,7 +2,7 @@ import { AgentResponseParser } from './abstractParser';
 import { WritingAgentResponse } from '../responseSchemas';
 import { AgentResponseParseError } from '../../../../types/errors/parsingError';
 import { SchemaValidator } from '../schemaValidator';
-import { WritingStructureDraft, TextSection } from '../../../../types/writing/writingStructure';
+import { TextSection } from '../../../../types/writing/writingStructure';
 import { parseJSONSafe } from '../../../../tools/utils/jsonParser';
 
 /**
@@ -86,7 +86,7 @@ export class WritingAgentParser extends AgentResponseParser<WritingAgentResponse
       const messageToOperator: string = parsedJson.messageToOperator;
       
       // Transform the sections array to match our TextSection interface
-      const rawSections = parsedJson.deliverables.writingStructureDraft || [];
+      const rawSections = parsedJson.deliverables.writingStructureDraft.sections || [];
       const sections: TextSection[] = rawSections.map((section: any) => ({
         content: "", // Initially empty
         creationInstructions: {

@@ -4,10 +4,15 @@ export function saveChat(history: ChatMessage[]): boolean {
     try {
         const fs = require('fs');
         const path = require('path');
+        const os = require('os');
 
-        // Adjust the path to save chat histories at the root level
-        const historyDir = path.join(process.cwd(), 'chatHistories', new Date().toISOString().split('T')[0]);
-        console.log(`Attempting to create directory: ${historyDir}`);
+        // Log the execution environment
+        console.log(`Current working directory: ${process.cwd()}`);
+        console.log(`Home directory: ${os.homedir()}`);
+        
+        // Use the user's home directory as a reliable location
+        const historyDir = path.join(os.homedir(), 'chatHistories', new Date().toISOString().split('T')[0]);
+        console.log(`Full directory path: ${historyDir}`);
         fs.mkdirSync(historyDir, { recursive: true });
 
         // Format the time as HHh_MMmin
@@ -18,7 +23,7 @@ export function saveChat(history: ChatMessage[]): boolean {
 
         // Save the history to a file with the new time format
         const historyFilePath = path.join(historyDir, `${timeString}.txt`);
-        console.log(`Attempting to create file: ${historyFilePath}`);
+        console.log(`Complete file path: ${historyFilePath}`);
         const separator = '\n\n' + "-".repeat(100) + '\n\n';
         fs.writeFileSync(historyFilePath, history.map(message => `${message.role}: ${message.content}`).join(separator))
         return true;

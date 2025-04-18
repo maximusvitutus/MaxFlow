@@ -51,13 +51,20 @@ export class WritingAgent extends OperatorControlledAgent {
     taskType: WritingAgentTask, 
     evaluator?: SystemOperatorEvaluator
   ): Promise<WritingStructureDraft> {
-    // Load the appropriate template based on task type
-    const promptTemplate = await loadPromptWritingAgent('./src/core/llm/prompts/chat/writingAgent.yaml');
-    const template = promptTemplate.templates?.[taskType];
-    
-    // Set the system prompt based on the template
-    this.systemPrompt = template || ''; 
-    this.history = [{ role: 'system', content: this.systemPrompt }];
+    try {
+      // Load the appropriate template based on task type
+      const promptTemplate = await loadPromptWritingAgent('./src/core/llm/prompts/writing/writingAgent.yaml');
+      const template = promptTemplate.templates?.[taskType];
+      
+      // Set the system prompt based on the template
+      this.systemPrompt = template || ''; 
+      this.history = [{ role: 'system', content: this.systemPrompt }];
+    } catch (error) {
+      console.error('Error loading writing agent prompt:', error);
+      // Use a fallback prompt when YAML loading fails
+      this.systemPrompt = `You are a writing structure expert. Create a well-organized outline for: ${taskType === WritingAgentTask.CREATION ? 'a new document' : 'improving an existing document'}.`;
+      this.history = [{ role: 'system', content: this.systemPrompt }];
+    }
     
     // Generate initial response
     let response = await this.provider.getResponse(request, this.history);
@@ -93,7 +100,7 @@ export class WritingAgent extends OperatorControlledAgent {
    * @returns A promise resolving to a writing structure draft
    */
   async createWritingStructure(request: string, evaluator?: SystemOperatorEvaluator): Promise<WritingStructureDraft> {
-    const rawDraft = await this.processOperatorTask(request, 'creation', evaluator);
+    const rawDraft = await this.processOperatorTask(request, WritingAgentTask.CREATION, evaluator);
     
     // Create a complete WritingStructureDraft with proper metadata
     return {
@@ -120,7 +127,7 @@ export class WritingAgent extends OperatorControlledAgent {
     evaluator?: SystemOperatorEvaluator
   ): Promise<WritingStructureDraft> {
     
-    const rawDraft = await this.processOperatorTask(feedback, 'iteration', evaluator);
+    const rawDraft = await this.processOperatorTask(feedback, WritingAgentTask.ITERATION, evaluator);
     
     // Create a revised WritingStructureDraft with updated metadata
     return {

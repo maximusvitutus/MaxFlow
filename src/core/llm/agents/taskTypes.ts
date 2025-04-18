@@ -2,7 +2,12 @@
 export type AgentTaskType = WritingAgentTask | ConversationAgentTask;
 
 // Specific task types for the writing agent
-export type WritingAgentTask = 'creation' | 'iteration';
+export enum WritingAgentTask {
+  CREATION = 'creation',
+  ITERATION = 'iteration'
+}
 
 // Specific task types for the conversation agent
-export type ConversationAgentTask = 'informationGathering';
+export enum ConversationAgentTask {
+  INFORMATION_GATHERING = 'informationGathering'
+}

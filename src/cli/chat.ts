@@ -8,6 +8,7 @@ import { saveChat } from '../core/tools/utils/chatHistorySaver';
 import yaml from 'js-yaml';
 import fs from 'fs/promises';
 import { MockOperator } from '../core/llm/operators/mockOperator';
+import { Max } from '../core/llm/operators/Max';
 
 // Define prompt paths directly in the file
 const PROMPT_PATHS = {
@@ -50,7 +51,7 @@ async function startChat() {
 
     // Initialize provider and operator
     const provider = new OpenAIProvider(apiKey, { model: 'gpt-4o' });
-    const mockOperator = new MockOperator();
+    const mockOperator = new Max(provider);
     const chatAgent = new ConversationAgent(provider, chatSystemPrompt, mockOperator);
     const evaluator = new SystemOperatorEvaluator(provider, evaluatorSystemPrompt, chatSystemPrompt);
 
