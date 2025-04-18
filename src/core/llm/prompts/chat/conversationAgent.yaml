@@ -83,7 +83,7 @@ template: |
     - The user has explicitly approved the plan.
 
   Parameters:
-    - name: "request"
+    - name: "requestWithContext"
       type: "string"
       description: 
         A complete summary of the user's needs and the proposed plan. 
@@ -119,7 +119,7 @@ template: |
       {
         "name": "getWritingStructure",
         "arguments": {
-          "request": "User wants a draft of a writing structure for a blog post about the benefits of using AI in the workplace. They want it to focus on knowledge work. They want concrete examples, and a general explanation of AI systems. It should contain data about how efficiency is improved. They also want to give tips on how to adopt AI."
+          "requestWithContext": "User wants a draft of a writing structure for a blog post about the benefits of using AI in the workplace. Key context: They want to focus specifically on knowledge work and avoid manufacturing examples. They requested concrete examples from real companies, and a general explanation of AI systems that's accessible to non-technical readers. They emphasized including recent data about productivity improvements (specifically mentioned wanting recent statistics, which means we should focus on data published in the last few months, if possible). They want practical tips for AI adoption, focusing on small to medium businesses. The user has experience with ChatGPT and wants to include personal anecdotes. Target audience, tone and length are unspecified"
         }
       }
     ]

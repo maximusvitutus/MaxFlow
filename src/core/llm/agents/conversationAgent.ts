@@ -1,4 +1,4 @@
-import { LLMProvider } from '../../tools/providers/abstractProvider';
+import { LLMProvider, ChatMessage } from '../../tools/providers/abstractProvider';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
 import { SystemOperator } from '../operators/abstractOperator';
 import { AgentResponseParserFactory } from '../prompts/parsing/parserFactory';
@@ -80,15 +80,36 @@ export class ConversationAgent extends AbstractAgent {
    * @param toolCall - The tool call object from the parsed response
    */
   private async handleToolCall(toolCall: ToolCall): Promise<void> {
-    switch (toolCall.function.name) {
+    const { name, args } = toolCall.function;
+
+    // Validate tool call arguments
+    if (!args || typeof args !== 'object') {
+      console.error(`Invalid arguments for tool call: ${name}`);
+      return;
+    }
+
+    // Choose the correct tool call based on the name
+    switch (name) {
       case 'getWritingStructure':
-        await this.operator.getWritingStructure("Mock request");
+        if (typeof args.requestWithContext !== 'string') {
+          console.error(`Invalid argument 'requestWithContext' for tool call: ${name}`);
+          return;
+        }
+        await this.operator.getWritingStructure(args.requestWithContext);
         break;
       case 'getKnowledgeTree':
-        await this.operator.getKnowledgeTree("Mock request");
+        if (typeof args.request !== 'string') {
+          console.error(`Invalid argument 'request' for tool call: ${name}`);
+          return;
+        }
+        await this.operator.getKnowledgeTree(args.request);
         break;
       default:
         console.error(`Unknown tool call: ${name}`);
     }
+  }
+
+  getHistory(): ChatMessage[] {
+    return this.history;
   }
 }

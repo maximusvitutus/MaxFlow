@@ -7,7 +7,6 @@ import { ChatMessage } from '../core/tools/providers/abstractProvider';
 import { saveChat } from '../core/tools/utils/chatHistorySaver';
 import yaml from 'js-yaml';
 import fs from 'fs/promises';
-import { MockOperator } from '../core/llm/operators/mockOperator';
 import { Max } from '../core/llm/operators/Max';
 
 // Define prompt paths directly in the file
