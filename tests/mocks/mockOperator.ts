@@ -56,4 +56,12 @@ export class MockOperator extends SystemOperator {
             }
         };
     }
+
+    async executeTask(): Promise<any> {
+        return {};
+    }
+
+    async evaluateResponse(): Promise<number> {
+        return 1;
+    }
 }

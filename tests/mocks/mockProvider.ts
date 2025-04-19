@@ -1,20 +1,13 @@
-import { LLMProvider, ChatMessage } from '../../src/core/tools/providers/abstractProvider';
-
-interface MockProviderOptions {
-  defaultResponse?: string;
-  responseMap?: Map<string, string>; // Maps specific inputs to custom responses
-  delayMs?: number; // Simulate response delay
-}
+import { LLMProvider } from '../../src/core/tools/providers/abstractProvider';
+import { ChatMessage } from '../../src/core/tools/providers/abstractProvider';
 
 export class MockProvider extends LLMProvider {
-  private options: MockProviderOptions;
-  private errorMode: boolean = false;
-  private errorMessage: string = "";
-  
-  constructor(apiKey: string) {
-    super(apiKey);
-  }
-  
+  private errorMode = false;
+  private errorMessage = "Mock error";
+  private delayMs = 0;
+  private responseMap: Map<string, string> = new Map();
+  private defaultResponse = "Default response";
+
   setErrorMode(enabled: boolean, message: string = "Mock error") {
     this.errorMode = enabled;
     this.errorMessage = message;
@@ -26,16 +19,16 @@ export class MockProvider extends LLMProvider {
     }
     
     // Simulate network delay
-    if (this.options.delayMs) {
-      await new Promise(r => setTimeout(r, this.options.delayMs));
+    if (this.delayMs) {
+      await new Promise(r => setTimeout(r, this.delayMs));
     }
     
     // Check if we have a specific response for this input
-    if (this.options.responseMap && this.options.responseMap.has(prompt)) {
-      return this.options.responseMap.get(prompt)!;
+    if (this.responseMap && this.responseMap.has(prompt)) {
+      return this.responseMap.get(prompt)!;
     }
     
     // Otherwise return the default
-    return this.options.defaultResponse!;
+    return this.defaultResponse;
   }
 }
