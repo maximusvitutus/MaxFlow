@@ -3,30 +3,10 @@ import dotenv from 'dotenv';
 import { OpenAIProvider } from '../core/tools/providers/openAIProvider';
 import { ConversationAgent } from '../core/llm/agents/conversationAgent';
 import { SystemOperatorEvaluator } from '../core/llm/agentEvaluators/operatorEvaluator';
-import { ChatMessage } from '../core/tools/providers/abstractProvider';
 import { saveChat } from '../core/tools/utils/chatHistorySaver';
 import yaml from 'js-yaml';
 import fs from 'fs/promises';
 import { Max } from '../core/llm/operators/Max';
-
-// Define prompt paths directly in the file
-const PROMPT_PATHS = {
-    CONVERSATION_AGENT: './src/core/llm/prompts/chat/conversationAgent.yaml',
-    OPERATOR_EVALUATOR: './src/core/llm/prompts/evaluation/taskAgnosticEvaluation.yaml'
-};
-
-// Function to load a prompt from a file
-async function loadPrompt(filePath: string): Promise<string> {
-    try {
-        const fileContents = await fs.readFile(filePath, 'utf8');
-        const yamlContent = yaml.load(fileContents) as { template: string };
-        return yamlContent.template;
-    } catch (error) {
-        const err = error as Error; // Type assertion
-        console.error(`Failed to load prompt from ${filePath}: ${err.message}`);
-        throw err;
-    }
-}
 
 dotenv.config();
 
@@ -43,19 +23,21 @@ const rl = readline.createInterface({
 });
 
 async function startChat() {
-    // Load prompt templates
-    const chatSystemPrompt = await loadPrompt(PROMPT_PATHS.CONVERSATION_AGENT);
-    console.log(chatSystemPrompt);
-    const evaluatorSystemPrompt = await loadPrompt(PROMPT_PATHS.OPERATOR_EVALUATOR);
-
     // Initialize provider and operator
     const provider = new OpenAIProvider(apiKey, { model: 'gpt-4o' });
     const mockOperator = new Max(provider);
-    const chatAgent = new ConversationAgent(provider, chatSystemPrompt, mockOperator);
-    const evaluator = new SystemOperatorEvaluator(provider, evaluatorSystemPrompt, chatSystemPrompt);
+    const chatAgent = new ConversationAgent(provider, mockOperator);
+    
+    // Load the evaluator template separately since it's not an agent
+    const evaluatorSystemPrompt = await fs.readFile(
+        './src/core/llm/prompts/evaluation/taskAgnosticEvaluation.yaml', 
+        'utf8'
+    );
+    const yamlContent = yaml.load(evaluatorSystemPrompt) as { template: string };
+    const evaluator = new SystemOperatorEvaluator(provider, yamlContent.template, chatAgent.getSystemPrompt());
 
-    // Initialize message history
-    const history: ChatMessage[] = [{ role: 'system', content: chatSystemPrompt }];
+    // Initialize message history by getting it from the agent
+    const history = chatAgent.getHistory();
 
     // Print initial prompt
     console.log('\nChat started! Type "exit" to end the conversation.\n\n');

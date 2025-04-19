@@ -9,17 +9,18 @@ import fs from 'fs/promises';
 import yaml from 'js-yaml';
 import { WritingAgentTask } from './taskTypes';
 import { PromptInterface } from '../prompts/interfaces';
+import { TEMPLATE_PATHS } from '../../config/templatePaths';
 
 // Function to load a prompt from a file
 async function loadPromptWritingAgent(filePath: string): Promise<PromptInterface> {
   try {
-      const fileContents = await fs.readFile(filePath, 'utf8');
-      const yamlContent = yaml.load(fileContents);
-      return yamlContent as PromptInterface;
+    const fileContents = await fs.readFile(filePath, 'utf8');
+    const yamlContent = yaml.load(fileContents);
+    return yamlContent as PromptInterface;
   } catch (error) {
-      const err = error as Error; // Type assertion
-      console.error(`Failed to load prompt from ${filePath}: ${err.message}`);
-      throw err;
+    const err = error as Error;
+    console.error(`Failed to load prompt from ${filePath}: ${err.message}`);
+    throw err;
   }
 }
 
@@ -34,8 +35,16 @@ export class WritingAgent extends OperatorControlledAgent {
    * @param provider - The LLM provider instance
    * @param operator - The system operator for handling specialized tasks
    */
-  constructor(provider: LLMProvider, mockPrompt: string, operator: SystemOperator) {
-    super(provider, mockPrompt, operator);
+  constructor(provider: LLMProvider, operator: SystemOperator) {
+    super(provider, operator);
+    this.initialize();
+  }
+
+  /**
+   * Get the template path for the writing agent
+   */
+  protected getTemplatePath(): string {
+    return TEMPLATE_PATHS.WRITING_AGENT;
   }
 
   /**
@@ -53,7 +62,7 @@ export class WritingAgent extends OperatorControlledAgent {
   ): Promise<WritingStructureDraft> {
     try {
       // Load the appropriate template based on task type
-      const promptTemplate = await loadPromptWritingAgent('./src/core/llm/prompts/writing/writingAgent.yaml');
+      const promptTemplate = await loadPromptWritingAgent(this.getTemplatePath());
       const template = promptTemplate.templates?.[taskType];
       
       // Set the system prompt based on the template

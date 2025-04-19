@@ -5,6 +5,7 @@ import { AgentResponseParserFactory } from '../parsing/parserFactory';
 import { ConversationAgentResponse } from '../parsing/responseSchemas';
 import { AbstractAgent, AgentType } from './abstractAgents';
 import { ToolCall } from '../../types/toolCall';
+import { TEMPLATE_PATHS } from '../../config/templatePaths';
 
 /**
  * Manages system-level chat interactions with the AI model
@@ -15,11 +16,18 @@ export class ConversationAgent extends AbstractAgent {
    * Creates a new ConversationAgent instance
    * 
    * @param provider - The LLM provider instance
-   * @param systemPrompt - The initial system prompt to set context
    * @param operator - The system operator for handling specialized tasks
    */
-  constructor(provider: LLMProvider, systemPrompt: string, operator: SystemOperator) {
-    super(provider, systemPrompt, operator);
+  constructor(provider: LLMProvider, operator: SystemOperator) {
+    super(provider, operator);
+    this.initialize();
+  }
+
+  /**
+   * Get the template path for the conversation agent
+   */
+  protected getTemplatePath(): string {
+    return TEMPLATE_PATHS.CONVERSATION_AGENT;
   }
 
   /**

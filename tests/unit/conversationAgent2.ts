@@ -18,7 +18,7 @@ describe('ConversationAgent Performance', () => {
       getKnowledgeTree: jest.fn()
     } as unknown as SystemOperator;
     
-    agent = new ConversationAgent(mockProvider, "test system prompt", mockOperator);
+    agent = new ConversationAgent(mockProvider,mockOperator);
     mockEvaluator = {
       evaluate: jest.fn().mockResolvedValue({ score: 0.9, feedback: "Good response" })
     } as unknown as SystemOperatorEvaluator;

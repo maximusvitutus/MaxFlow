@@ -1,7 +1,6 @@
 import { ConversationAgent } from '../../src/core/llm/agents/conversationAgent';
 import { MockProvider } from '../mocks/mockProvider';
 import { SystemOperator } from '../../src/core/llm/operators/abstractOperator';
-import { SystemOperatorEvaluator } from '../../src/core/llm/agentEvaluators/operatorEvaluator';
 
 // Test helper functions
 const createMockResponse = (content: Partial<any>) => {
@@ -24,7 +23,7 @@ describe('ConversationAgent', () => {
       getKnowledgeTree: jest.fn()
     } as unknown as SystemOperator;
     
-    agent = new ConversationAgent(mockProvider, "test system prompt", mockOperator);
+    agent = new ConversationAgent(mockProvider, mockOperator);
   });
 
   describe('processMessage', () => {
@@ -43,7 +42,8 @@ describe('ConversationAgent', () => {
       const longMessage = "a".repeat(10000);
       mockProvider.getResponse = jest.fn().mockResolvedValue(createMockResponse({
         reasoning: "Processing long message",
-        answerToUser: "I've received your detailed message"
+        answerToUser: "I've received your detailed message",
+        toolCalls: []
       }));
 
       const response = await agent.processMessage(longMessage);
@@ -82,7 +82,8 @@ describe('ConversationAgent', () => {
       const userMessage = "Hello AI";
       const expectedResponse = createMockResponse({
         reasoning: "Greeting the user",
-        answerToUser: "Hello! How can I help you today?"
+        answerToUser: "Hello! How can I help you today?",
+        toolCalls: []
       });
       
       mockProvider.getResponse = jest.fn().mockResolvedValue(expectedResponse);
@@ -90,7 +91,6 @@ describe('ConversationAgent', () => {
 
       const history = agent.getHistory();
       expect(history).toEqual([
-        { role: 'system', content: "test system prompt" },
         { role: 'user', content: userMessage },
         { role: 'assistant', content: expectedResponse }
       ]);

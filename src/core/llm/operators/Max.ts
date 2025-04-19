@@ -10,8 +10,7 @@ export class Max extends SystemOperator {
 
     constructor(provider: LLMProvider) {
         super();
-        // Initialize with empty prompt initially (basically a placeholder)
-        this.writingAgent = new WritingAgent(provider, "", this);
+        this.writingAgent = new WritingAgent(provider, this);
         
     }
 

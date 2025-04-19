@@ -3,6 +3,9 @@ import { SystemOperator } from '../operators/abstractOperator';
 import { SystemOperatorEvaluator } from '../agentEvaluators/operatorEvaluator';
 import { EvaluationResult } from '../agentEvaluators/abstractEvaluator';
 import { AgentTaskType } from './taskTypes';
+import fs from 'fs/promises';
+import yaml from 'js-yaml';
+import { TEMPLATE_PATHS } from '../../config/templatePaths';
 
 /**
  * Abstract base class for all AI agents in the system
@@ -13,7 +16,7 @@ export abstract class AbstractAgent {
   /** Full conversation history */
   protected history: ChatMessage[] = [];
   /** System prompt that guides the agent's behavior */
-  protected systemPrompt: string;
+  protected systemPrompt: string = '';
   /** Minimum score considered acceptable in evaluations */
   protected readonly ACCEPTABLE_SCORE = 90;
   /** Maximum number of response improvement attempts */
@@ -25,14 +28,46 @@ export abstract class AbstractAgent {
    * Creates a new AbstractAgent instance
    * 
    * @param provider - The LLM provider instance
-   * @param systemPrompt - The initial system prompt to set context
    * @param operator - The system operator for handling specialized tasks
    */
-  constructor(provider: LLMProvider, systemPrompt: string, operator: SystemOperator) {
+  constructor(provider: LLMProvider, operator: SystemOperator) {
     this.provider = provider;
-    this.systemPrompt = systemPrompt;
-    this.history.push({ role: 'system', content: this.systemPrompt });
     this.operator = operator;
+  }
+
+  /**
+   * Get the template path for this agent type
+   * This method should be implemented by each agent subclass
+   */
+  protected abstract getTemplatePath(): string;
+
+  /**
+   * Initializes the agent by loading its template and setting up history
+   */
+  protected async initialize(): Promise<void> {
+    // Load the system prompt from template
+    this.systemPrompt = await this.loadTemplate(this.getTemplatePath());
+    
+    // Initialize history with system prompt
+    this.history = [{ role: 'system', content: this.systemPrompt }];
+  }
+
+  /**
+   * Loads a template from a file
+   * 
+   * @param templatePath - Path to the template file
+   * @returns The loaded template as a string
+   */
+  protected async loadTemplate(templatePath: string): Promise<string> {
+    try {
+      const fileContents = await fs.readFile(templatePath, 'utf8');
+      const yamlContent = yaml.load(fileContents) as { template: string };
+      return yamlContent.template;
+    } catch (error) {
+      const err = error as Error;
+      console.error(`Failed to load template from ${templatePath}: ${err.message}`);
+      throw err;
+    }
   }
 
   /**
@@ -96,6 +131,13 @@ export abstract class AbstractAgent {
    */
   getConversationHistory(): ChatMessage[] {
     return this.history;
+  }
+
+  /**
+   * Returns the current system prompt
+   */
+  getSystemPrompt(): string {
+    return this.systemPrompt;
   }
 }
 
