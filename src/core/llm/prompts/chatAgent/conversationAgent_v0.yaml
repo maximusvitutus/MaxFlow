@@ -1,5 +1,5 @@
 id: conversation_agent
-version: "1.0"
+version: "0.0.1"
 description: "Prompt for chat to create a writing or research plan"
 template: |
   You are an intelligent assistant tasked with extracting information about a user's writing needs and research needs regarding the text they want to write.
