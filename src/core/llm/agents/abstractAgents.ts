@@ -5,7 +5,6 @@ import { EvaluationResult } from '../agentEvaluators/abstractEvaluator';
 import { AgentTaskType } from './taskTypes';
 import fs from 'fs/promises';
 import yaml from 'js-yaml';
-import { TEMPLATE_PATHS } from '../../config/templatePaths';
 
 /**
  * Abstract base class for all AI agents in the system

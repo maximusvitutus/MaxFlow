@@ -120,4 +120,16 @@ export class ConversationAgent extends AbstractAgent {
   getHistory(): ChatMessage[] {
     return this.history;
   }
+
+  /**
+   * Process multiple messages as a conversation. Overwrites the history with the new messages.
+   */
+  async processMessages(messages: ChatMessage[], evaluator?: SystemOperatorEvaluator): Promise<string> {
+    // Add all messages to history
+    this.history.push(...messages);
+    
+    // Get response to the full conversation
+    const lastMessage = messages[messages.length - 1].content;
+    return this.processMessage(lastMessage, evaluator);
+  }
 }
