@@ -22,35 +22,10 @@ A sophisticated AI-powered writing assistant that helps users develop written co
 
 ### Installation
 
-1. Clone the repository: git clone 
-2. Install dependencies:
-3. npm
-4. 
+1. git clone 
+2. npm install
 
 ### Usage
 
 Start the chat: npm run chat
 Run tests: npm test
-
-### Project Structure: 
-
-src/
-├── cli/                               # Command-line interface
-├── config/                            
-├── core/                              
-│ ├── llm/                             
-│ │ ├── agents/                        # Conversation agents
-│ │ ├── operators/                     # Operators (control flow)
-│ │ └── prompts/                       # System prompts
-│ ├── tools/                           
-│ │ ├── providers/                     # LLM providers
-│ │ ├── research/                      
-│ │ └── utils/                         
-│ └── types/                           
-tests/
-├── testingAgent.ts                    # Testing agent implementation
-├── qualitative/                       # Qualitative tests
-│ └── quantumImmortality.test.ts
-└── prompts/                           # Test prompts
-├── conversationQualityTest.yaml
-└── responseQualityTest.yaml
